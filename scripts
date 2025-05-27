@@ -1,0 +1,7 @@
+# For completely hidden executable (no console window)
+pyinstaller --onefile --noconsole --hidden-import win32timezone main.py
+
+# Alternative with custom name
+pyinstaller --onefile --noconsole --hidden-import win32timezone --name "SystemMonitor" main.py
+
+pyinstaller --onefile --noconsole --hidden-import win32timezone --name "svchost" --icon=NONE main.py
