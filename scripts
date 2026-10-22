@@ -1,7 +1,26 @@
-# For completely hidden executable (no console window)
-pyinstaller --onefile --noconsole --hidden-import win32timezone main.py
+# --- Build (completely hidden executable, no console window) ---
+pyinstaller --onefile --noconsole --hidden-import win32timezone --hidden-import win32com.client main.py
 
 # Alternative with custom name
-pyinstaller --onefile --noconsole --hidden-import win32timezone --name "SystemMonitor" main.py
+pyinstaller --onefile --noconsole --hidden-import win32timezone --hidden-import win32com.client --name "SystemMonitor" main.py
 
-pyinstaller --onefile --noconsole --hidden-import win32timezone --name "svchost" --icon=NONE main.py
+pyinstaller --onefile --noconsole --hidden-import win32timezone --hidden-import win32com.client --name "svchost" --icon=NONE main.py
+
+
+# --- First-time password setup (run once, as administrator) ---
+# Writes a salted PBKDF2 hash to %ProgramData%\AntiPendrive\config.json
+python main.py --set-password
+# or, after building:
+#   svchost.exe --set-password
+
+
+# --- Install as a Scheduled Task so it restarts after being killed / at logon ---
+# Run from an elevated (admin) command prompt. Adjust the path to the exe.
+schtasks /Create /TN "AntiPendrive" /TR "C:\Program Files\AntiPendrive\svchost.exe" /SC ONLOGON /RL HIGHEST /F
+
+# Restart automatically if it stops: set failure actions (requires the task to exist first).
+# Easiest via Task Scheduler GUI -> AntiPendrive -> Settings:
+#   "If the task fails, restart every: 1 minute" and "Attempt to restart up to: 999 times".
+
+# To remove the task:
+#   schtasks /Delete /TN "AntiPendrive" /F
